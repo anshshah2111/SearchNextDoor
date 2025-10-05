@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Book Next Door</title>
+    <style>
+        :root {
+            --background: #ffffff; --text: #000000; --border: #dcdcdc;
+            --accent: #333333; --placeholder: #888888; --error: #d32f2f;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #121212; --text: #e0e0e0; --border: #333333;
+                --accent: #f5f5f5; --placeholder: #666666;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--background); color: var(--text); display: flex;
+            justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+        }
+        .search-container { width: 100%; max-width: 600px; text-align: center; }
+        .logo { font-size: 2.5rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -1px; }
+        .subtitle { font-size: 1rem; color: var(--placeholder); margin-bottom: 30px; }
+        .search-box {
+            display: flex; border: 1px solid var(--border); border-radius: 50px;
+            overflow: hidden; background-color: var(--background);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-box:focus-within { border-color: var(--text); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+        .search-input {
+            flex-grow: 1; border: none; outline: none; padding: 18px 25px;
+            font-size: 1rem; background-color: transparent; color: var(--text);
+        }
+        .search-input::placeholder { color: var(--placeholder); }
+        .search-btn {
+            border: none; outline: none; background-color: var(--accent); color: var(--background);
+            padding: 0 35px; cursor: pointer; font-size: 1rem; font-weight: 600;
+            transition: background-color 0.2s; min-width: 120px;
+        }
+        .search-btn:hover { opacity: 0.85; }
+        .search-btn:disabled { background-color: var(--border); cursor: not-allowed; }
+        .status-message { margin-top: 20px; min-height: 24px; font-size: 0.9rem; transition: color 0.2s; }
+        .status-message.error { color: var(--error); }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <div class="logo">Your Book Next Door</div>
+        <p class="subtitle">Your friendly neighborhood library</p>
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="e.g., Pride and Prejudice..." autocomplete="off">
+            <button class="search-btn" id="searchBtn">Search</button>
+        </div>
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        async function handleSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            searchBtn.disabled = true;
+            searchBtn.textContent = '...';
+            statusMessage.textContent = 'Searching the digital library...';
+            statusMessage.classList.remove('error');
+
+            try {
+                const response = await fetch('http://localhost:3000/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'An unknown server error occurred.');
+                }
+
+                statusMessage.textContent = 'Book found. Preparing download...';
+                
+                const contentDisposition = response.headers.get('content-disposition');
+                let filename = `${query.replace(/ /g, '_')}.txt`;
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+                    if (filenameMatch.length > 1) filename = filenameMatch[1];
+                }
+                
+                const fileBlob = await response.blob();
+                const url = URL.createObjectURL(fileBlob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                
+                statusMessage.textContent = 'Download prompted successfully!';
+
+            } catch (err) {
+                statusMessage.textContent = `Error: ${err.message}`;
+                statusMessage.classList.add('error');
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Search';
+            }
+        }
+
+        searchBtn.addEventListener('click', handleSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch();
+        });
+    </script>
+</body>
+</html>
