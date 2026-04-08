@@ -20,16 +20,14 @@ export async function POST(req: Request) {
 
   const cleanMessages = ensureAlternating(messages);
 
-  // 1. Try Ollama (local, completely free)
+  // 1. Try Ollama (local, completely free) — auto-detects if running
   const ollamaHost = process.env.OLLAMA_HOST || "http://localhost:11434";
   const ollamaModel = process.env.OLLAMA_MODEL || "llama3.2";
-  if (process.env.OLLAMA_HOST || process.env.USE_OLLAMA === "true") {
-    try {
-      const text = await callOllama(ollamaHost, ollamaModel, cleanMessages);
-      if (text) return Response.json({ text, source: "ollama" });
-    } catch (e) {
-      console.error("Ollama error:", e);
-    }
+  try {
+    const text = await callOllama(ollamaHost, ollamaModel, cleanMessages);
+    if (text) return Response.json({ text, source: "ollama" });
+  } catch {
+    // Ollama not running, try next provider
   }
 
   // 2. Try Groq (free cloud tier — 30 req/min, fast inference)
