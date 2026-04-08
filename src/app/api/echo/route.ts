@@ -20,14 +20,16 @@ export async function POST(req: Request) {
 
   const cleanMessages = ensureAlternating(messages);
 
-  // 1. Try Ollama (local, completely free) — auto-detects if running
+  // 1. Try Ollama (local, completely free) — quick ping then call
   const ollamaHost = process.env.OLLAMA_HOST || "http://localhost:11434";
   const ollamaModel = process.env.OLLAMA_MODEL || "llama3.2";
-  try {
-    const text = await callOllama(ollamaHost, ollamaModel, cleanMessages);
-    if (text) return Response.json({ text, source: "ollama" });
-  } catch {
-    // Ollama not running, try next provider
+  if (await isOllamaRunning(ollamaHost)) {
+    try {
+      const text = await callOllama(ollamaHost, ollamaModel, cleanMessages);
+      if (text) return Response.json({ text, source: "ollama" });
+    } catch {
+      // Ollama responded to ping but chat failed, try next provider
+    }
   }
 
   // 2. Try Groq (free cloud tier — 30 req/min, fast inference)
@@ -55,6 +57,16 @@ export async function POST(req: Request) {
   // 4. Fallback to pre-scripted responses (always works, no setup)
   const text = getEchoFallback(intent || "freeform");
   return Response.json({ text, source: "fallback" });
+}
+
+/** Quick check if Ollama is running (1s timeout so it doesn't block) */
+async function isOllamaRunning(host: string): Promise<boolean> {
+  try {
+    const res = await fetch(host, { signal: AbortSignal.timeout(1000) });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 /** Ollama — local LLM, completely free. Install: https://ollama.com */
