@@ -173,6 +173,129 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* "Sound familiar?" — ICP recognition section */}
+      <section className="px-6 py-24 bg-white/[0.01]">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Sound familiar?
+            </h2>
+            <p className="text-gray-500 text-lg">
+              We talked to dozens of people. This is what they told us.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 gap-5 mb-14">
+            {[
+              {
+                quote:
+                  "You told yourself you'd go outside today. It's 8 PM. You didn't.",
+                detail:
+                  "Not because you couldn't. Because nothing was pulling you out the door. The couch won again.",
+              },
+              {
+                quote:
+                  "Your Fitbit says 300 steps. It doesn't make you move. It just makes you feel guilty.",
+                detail:
+                  "Tracking doesn't create motivation. It just creates a number that judges you.",
+              },
+              {
+                quote:
+                  "You haven't seen a friend in person in three weeks. Not because anything happened. Everyone just got busy.",
+                detail:
+                  "Nobody had a fight. Nobody moved away. Life just quietly got in the way and stayed there.",
+              },
+              {
+                quote:
+                  "You're not sad. You're not broken. You're just flat. And nobody's giving you a reason to put your shoes on.",
+                detail:
+                  "The to-do list never ends. The screens never stop. And the door stays closed.",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7"
+              >
+                <p className="text-white font-medium text-lg leading-snug mb-3">
+                  &ldquo;{item.quote}&rdquo;
+                </p>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  {item.detail}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* The Jordan vignette */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="bg-gradient-to-br from-amber-500/[0.06] to-transparent border border-amber-500/10 rounded-2xl p-8 sm:p-10">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-sm font-semibold">
+                  J
+                </div>
+                <div>
+                  <div className="text-white font-medium">Jordan, 29</div>
+                  <div className="text-gray-500 text-sm">
+                    Product designer, Seattle
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4 text-gray-300 leading-relaxed">
+                <p>
+                  Jordan works from a desk four feet from their bed. The commute
+                  is standing up. They make coffee, open Slack, and don&apos;t
+                  leave the apartment until — well, sometimes they don&apos;t.
+                </p>
+                <p>
+                  It&apos;s not that Jordan is sad. Everything is fine.
+                  That&apos;s the problem. Every day is fine. Same screens, same
+                  walls, same granola bar at the counter.
+                </p>
+                <p>
+                  Jordan has tried Strava, Peloton, ClassPass. They bounced off
+                  all of them because being told to{" "}
+                  <span className="text-white">&ldquo;crush your workout&rdquo;</span>{" "}
+                  on top of everything else feels like another item on a list
+                  that never ends.
+                </p>
+                <p className="text-white font-medium">
+                  Jordan doesn&apos;t need a fitness app. Jordan needs someone to
+                  say{" "}
+                  <span className="text-amber-400">
+                    &ldquo;hey, let&apos;s go&rdquo;
+                  </span>{" "}
+                  — and mean it.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center text-gray-500 mt-10 text-lg"
+          >
+            Roam isn&apos;t here to fix you. Echo&apos;s just here to walk with
+            you.
+          </motion.p>
+        </div>
+      </section>
+
       {/* The emotional pitch */}
       <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
