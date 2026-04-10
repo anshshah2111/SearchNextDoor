@@ -85,10 +85,22 @@ export default function LandingPage() {
             >
               Start walking with Echo
             </Link>
-            <span className="text-sm text-gray-500">
-              No account needed. No download.
-            </span>
+            <Link
+              href="/demo"
+              target="_blank"
+              className="px-8 py-4 bg-white/10 text-white text-lg font-medium rounded-full border border-white/10 hover:bg-white/15 transition-all"
+            >
+              Watch demo
+            </Link>
           </motion.div>
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-4 text-sm text-gray-500"
+          >
+            No account needed. No download.
+          </motion.span>
         </motion.div>
 
         {/* Scroll indicator */}
