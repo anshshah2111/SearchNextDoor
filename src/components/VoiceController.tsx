@@ -76,17 +76,29 @@ export default function VoiceController({
       onStateChange("thinking");
 
       try {
-        const response = await fetch("/api/echo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            history: historyRef.current,
-            intent,
-          }),
-        });
+        // Try API route first, fall back to client-side for static export
+        let text: string | null = null;
+        try {
+          const response = await fetch("/api/echo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              history: historyRef.current,
+              intent,
+            }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            text = data.text;
+          }
+        } catch {
+          // API not available (static export) — use client-side fallback
+        }
 
-        const data = await response.json();
-        const text = data.text;
+        if (!text) {
+          const { getEchoFallback } = await import("@/lib/echo-fallback");
+          text = getEchoFallback(intent);
+        }
 
         if (text) {
           historyRef.current.push({ role: "assistant", content: text });
